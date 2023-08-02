@@ -1,18 +1,33 @@
 import React, { Component } from 'react';
 import css from './Searchbar.module.css';
 import { TbPhotoSearch } from 'react-icons/tb';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default class Searchbar extends Component {
-  state = {};
+  state = {
+    inputValue: '',
+  };
+
+  handleInputChange = e => {
+    this.setState({ inputValue: e.target.value });
+  };
+
+  resetForm() {
+    this.setState({ inputValue: '' });
+  }
 
   onSubmit = e => {
     e.preventDefault();
-    console.log('onSubmit');
-    const form = e.target;
 
-    const searchQuery = form.elements.search.value;
+    if (this.state.inputValue.trim() === '') {
+      toast.warn('Search bar is empty! Please enter a search query.');
+      this.resetForm();
+      return;
+    }
 
-    this.props.onSubmit(searchQuery);
+    this.props.onSubmit(this.state.inputValue);
+    this.resetForm();
   };
 
   render() {
@@ -24,11 +39,13 @@ export default class Searchbar extends Component {
           </button>
           <input
             className={css.searchFormInput}
+            value={this.state.inputValue}
             name="search"
             type="text"
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
+            onChange={this.handleInputChange}
           />
         </form>
       </header>
