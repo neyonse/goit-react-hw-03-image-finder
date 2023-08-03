@@ -19,18 +19,21 @@ export default class Searchbar extends Component {
 
   onSubmit = e => {
     e.preventDefault();
+    const { inputValue } = this.state;
 
-    if (this.state.inputValue.trim() === '') {
+    if (inputValue.trim() === '') {
       toast.warn('Search bar is empty! Please enter a search query.');
       this.resetForm();
       return;
     }
 
-    this.props.onSubmit(this.state.inputValue);
+    this.props.onSubmit(inputValue);
     this.resetForm();
   };
 
   render() {
+    const { inputValue } = this.state;
+
     return (
       <header className={css.searchbar}>
         <form className={css.searchForm} onSubmit={this.onSubmit}>
@@ -39,7 +42,7 @@ export default class Searchbar extends Component {
           </button>
           <input
             className={css.searchFormInput}
-            value={this.state.inputValue}
+            value={inputValue}
             name="search"
             type="text"
             autoComplete="off"
