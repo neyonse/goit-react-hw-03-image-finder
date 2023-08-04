@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import css from './ImageGallery.module.css';
 import { APIservices } from 'utils';
+import Loader from 'components/Loader';
 import ImageGalleryItem from 'components/ImageGalleryItem';
 import Button from 'components/Button';
+// import { toast } from 'react-toastify';
 
 export default class ImageGallery extends Component {
   state = {
@@ -17,16 +19,6 @@ export default class ImageGallery extends Component {
 
   async fetchImages(searchQuery, page) {
     try {
-      const { status, showBtn } = this.state;
-
-      if (status === 'idle') {
-        this.setState({ status: 'pending' });
-      }
-
-      if (showBtn) {
-        this.setState({ showBtnLoader: true });
-      }
-
       const { hits, total } = await APIservices.fetchImages(searchQuery, page);
 
       this.setState({ total, status: 'resolved', showBtnLoader: false });
@@ -55,11 +47,13 @@ export default class ImageGallery extends Component {
         status: 'idle',
       });
 
+      this.setState({ status: 'pending' });
       this.fetchImages(newSearchQuery, 1);
       return;
     }
 
     if (prevState.page !== page && data.length !== 0) {
+      this.setState({ showBtnLoader: true });
       this.fetchImages(searchQuery, page);
       return;
     }
@@ -74,17 +68,26 @@ export default class ImageGallery extends Component {
       this.state;
 
     if (status === 'idle') {
-      return;
+      return (
+        <p className={css.galleryMessage}>
+          Enter your query to find the images.
+        </p>
+      );
     }
 
     if (status === 'pending') {
-      return <p>Loading images... Please, wait.</p>;
+      return <Loader />;
     }
 
     if (status === 'rejected') {
       return (
-        <p>Sorry! Something went wrong. Please, try another search query.</p>
+        <p className={css.galleryMessage}>
+          Sorry! Something went wrong. Please, try reload the page.
+        </p>
       );
+      // return toast.error(
+      //   'Sorry! Something went wrong. Please, try reload the page.'
+      // );
     }
 
     if (status === 'resolved') {
@@ -92,7 +95,7 @@ export default class ImageGallery extends Component {
         <section className={css.gallerySection}>
           {total === 0 && (
             <p className={css.galleryMessage}>
-              Sorry! We found no images for "{searchQuery}"!
+              Sorry! We found no images for "{searchQuery}".
             </p>
           )}
           {total && (
@@ -105,10 +108,9 @@ export default class ImageGallery extends Component {
               <ImageGalleryItem key={el.id} imageInfo={el} />
             ))}
           </ul>
-          {showBtn && !showBtnLoader && (
-            <Button onClick={this.handleLoadMore} />
+          {showBtn && (
+            <Button onClick={this.handleLoadMore} showLoader={showBtnLoader} />
           )}
-          {showBtnLoader && <p>Loading images... Please, wait.</p>}
         </section>
       );
     }

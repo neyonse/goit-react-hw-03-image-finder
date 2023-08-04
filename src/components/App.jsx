@@ -15,7 +15,7 @@ export class App extends Component {
     return (
       <div className={css.app}>
         <Searchbar onSubmit={this.handleSubmit} />
-        <ImageGallery searchQuery={this.state.searchQuery} page={1} />
+        <ImageGallery searchQuery={this.state.searchQuery} />
         <ToastContainer />
       </div>
     );
