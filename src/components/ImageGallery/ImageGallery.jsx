@@ -4,7 +4,7 @@ import { APIservices } from 'utils';
 import Loader from 'components/Loader';
 import ImageGalleryItem from 'components/ImageGalleryItem';
 import Button from 'components/Button';
-// import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
 
 export default class ImageGallery extends Component {
   state = {
@@ -16,24 +16,6 @@ export default class ImageGallery extends Component {
     showBtn: false,
     showBtnLoader: false,
   };
-
-  async fetchImages(searchQuery, page) {
-    try {
-      const { hits, total } = await APIservices.fetchImages(searchQuery, page);
-
-      this.setState({ total, status: 'resolved', showBtnLoader: false });
-      this.setState(prevState => ({ data: [...prevState.data, ...hits] }));
-
-      if (hits.length < 12) {
-        this.setState({ showBtn: false });
-        return;
-      }
-
-      this.setState({ showBtn: true });
-    } catch (error) {
-      this.setState({ status: 'rejected' });
-    }
-  }
 
   componentDidUpdate(prevProps, prevState) {
     const newSearchQuery = this.props.searchQuery;
@@ -59,6 +41,24 @@ export default class ImageGallery extends Component {
     }
   }
 
+  async fetchImages(searchQuery, page) {
+    try {
+      const { hits, total } = await APIservices.fetchImages(searchQuery, page);
+
+      this.setState({ total, status: 'resolved', showBtnLoader: false });
+      this.setState(prevState => ({ data: [...prevState.data, ...hits] }));
+
+      if (hits.length < 12 || total === 12) {
+        this.setState({ showBtn: false });
+        return;
+      }
+
+      this.setState({ showBtn: true });
+    } catch (error) {
+      this.setState({ status: 'rejected' });
+    }
+  }
+
   handleLoadMore = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
   };
@@ -76,36 +76,30 @@ export default class ImageGallery extends Component {
     }
 
     if (status === 'pending') {
-      return <Loader />;
+      return <Loader message={'Loading images... Please, wait.'} />;
     }
 
     if (status === 'rejected') {
       return (
-        <p className={css.galleryMessage}>
-          Sorry! Something went wrong. Please, try reload the page.
+        <p className={css.galleryMessage} style={{ color: 'red' }}>
+          Oops! Something went wrong. Please, try reload the page.
         </p>
       );
-      // return toast.error(
-      //   'Sorry! Something went wrong. Please, try reload the page.'
-      // );
     }
 
     if (status === 'resolved') {
       return (
         <section className={css.gallerySection}>
-          {total === 0 && (
-            <p className={css.galleryMessage}>
-              Sorry! We found no images for "{searchQuery}".
-            </p>
-          )}
-          {total && (
-            <p className={css.galleryMessage}>
-              We found {total} images for "{searchQuery}"!
-            </p>
-          )}
+          <p className={css.galleryMessage}>
+            We found {total} images for "{searchQuery}"!
+          </p>
           <ul className={css.gallery}>
             {data.map(el => (
-              <ImageGalleryItem key={el.id} imageInfo={el} />
+              <ImageGalleryItem
+                key={el.id}
+                imageInfo={el}
+                showLargeImage={this.props.showLargeImage}
+              />
             ))}
           </ul>
           {showBtn && (
@@ -116,3 +110,8 @@ export default class ImageGallery extends Component {
     }
   }
 }
+
+ImageGallery.propTypes = {
+  searchQuery: PropTypes.string.isRequired,
+  showLargeImage: PropTypes.func.isRequired,
+};

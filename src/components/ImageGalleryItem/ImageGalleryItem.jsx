@@ -1,11 +1,22 @@
 import css from './ImageGalleryItem.module.css';
+import PropTypes from 'prop-types';
 
-const ImageGalleryItem = ({ imageInfo: { webformatURL, tags } }) => {
+export default function ImageGalleryItem({ imageInfo, showLargeImage }) {
+  const { webformatURL, tags: alt, largeImageURL } = imageInfo;
+
   return (
-    <li className={css.galleryItem}>
-      <img className={css.galleryItemImage} src={webformatURL} alt={tags} />
+    <li
+      className={css.galleryItem}
+      onClick={() => {
+        showLargeImage(largeImageURL, alt);
+      }}
+    >
+      <img className={css.galleryItemImage} src={webformatURL} alt={alt} />
     </li>
   );
-};
+}
 
-export default ImageGalleryItem;
+ImageGalleryItem.propTypes = {
+  imageInfo: PropTypes.object.isRequired,
+  showLargeImage: PropTypes.func.isRequired,
+};
