@@ -50,7 +50,7 @@ export default class ImageGallery extends Component {
         status: 'resolved',
         showBtnLoader: false,
         data: [...prevState.data, ...hits],
-        showBtn: hits.length < 12 || total === 12 ? false : true,
+        showBtn: page < Math.ceil(total / 12) ? true : false,
       }));
     } catch (error) {
       this.setState({ status: 'rejected' });
