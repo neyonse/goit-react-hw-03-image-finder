@@ -28,17 +28,18 @@ export class App extends Component {
 
   render() {
     const { searchQuery, showModal, largeImageURL, alt } = this.state;
+    const { handleSubmit, showLargeImage, toggleModal } = this;
 
     return (
       <div className={css.app}>
-        <Searchbar onSubmit={this.handleSubmit} />
+        <Searchbar onSubmit={handleSubmit} />
         <ImageGallery
           searchQuery={searchQuery}
-          showLargeImage={this.showLargeImage}
+          showLargeImage={showLargeImage}
         />
         <ToastContainer />
         {showModal && (
-          <Modal onClose={this.toggleModal}>
+          <Modal onClose={toggleModal}>
             <img src={largeImageURL} alt={alt} />
           </Modal>
         )}

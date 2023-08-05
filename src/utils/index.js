@@ -1,1 +1,1 @@
-export { default as APIservices } from './fetch-api';
+export { default } from './fetch-api';

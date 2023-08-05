@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import css from './ImageGallery.module.css';
-import { APIservices } from 'utils';
+import APIservices from 'utils';
 import Loader from 'components/Loader';
 import ImageGalleryItem from 'components/ImageGalleryItem';
 import Button from 'components/Button';
@@ -45,15 +45,13 @@ export default class ImageGallery extends Component {
     try {
       const { hits, total } = await APIservices.fetchImages(searchQuery, page);
 
-      this.setState({ total, status: 'resolved', showBtnLoader: false });
-      this.setState(prevState => ({ data: [...prevState.data, ...hits] }));
-
-      if (hits.length < 12 || total === 12) {
-        this.setState({ showBtn: false });
-        return;
-      }
-
-      this.setState({ showBtn: true });
+      this.setState(prevState => ({
+        total,
+        status: 'resolved',
+        showBtnLoader: false,
+        data: [...prevState.data, ...hits],
+        showBtn: hits.length < 12 || total === 12 ? false : true,
+      }));
     } catch (error) {
       this.setState({ status: 'rejected' });
     }
